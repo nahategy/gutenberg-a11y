@@ -15,10 +15,8 @@ if (!defined('ABSPATH')) {
 
 final class GutenbergA11y
 {
-    const TRIAL_CUSTOMER_ID = '1:cma3h3-HTiyU3-JL08g4-SRyuS1-a9c0F3-kH6Cu-OlMHS-thcSV2-HlGmv3-YzRCN2-qrKY42-uPc';
-    const SLANG = 'en_US';
     const BADGE_BUTTON = 'off';
-    const PLUGIN_VERSION = "2.5";
+    const PLUGIN_VERSION = "0.1";
     private static $instance = null;
     private $js_added = false;
     private $settings;
@@ -54,7 +52,6 @@ final class GutenbergA11y
             update_option('wsc_proofreader_version', self::PLUGIN_VERSION);
         }
 
-        $this->options['customer_id'] = $this->get_customer_id();
 
         add_action('admin_enqueue_scripts', array($this, 'register_proofreader_scripts'));
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_action_links'));
@@ -108,8 +105,8 @@ final class GutenbergA11y
             foreach ($this->options as $option => $on) {
 
                 if ($option === 'enable_on_posts' && $on === 'on') {
-
                     if (0 === strcasecmp('post', $editable_post_type)) {
+
                         $this->init_proofreader_js();
                     }
                     break;
@@ -199,47 +196,22 @@ final class GutenbergA11y
 
     function register_proofreader_scripts()
     {
-        wp_register_script('ProofreaderInstance', plugin_dir_url(__FILE__) . '/assets/instance.js', array('wscbundle'), '171220181251', true);
+        wp_register_script('ProofreaderInstance', plugin_dir_url(__FILE__) . '/assets/instance.js', null, '171220181251', true);
     }
 
     function init_proofreader_js()
     {
-        $key_for_proofreader = $this->get_customer_id();
-        $slang = $this->get_slang();
         $badge_button_optinon = ($this->get_badge_button_optinon() === self::BADGE_BUTTON) ? 'true' : 'false';
         $wsc_proofreader_config = array(
-            'key_for_proofreader' => $key_for_proofreader,
-            'slang' => $slang,
             'enableGrammar' => 'false',
             'disableBadgeButton' => $badge_button_optinon,
         );
+        wp_enqueue_script('ProofreaderInstance');
     }
 
-    /**
-     * Get customer ID or trial ID if not set
-     *
-     * @return string customer ID
-     */
-    public function get_customer_id()
+    public function get_option_example()
     {
-        $customer_id = $this->get_option('customer_id', self::TRIAL_CUSTOMER_ID);
-
-        if (empty($customer_id)) {
-            return self::TRIAL_CUSTOMER_ID;
-        }
-
-        return $customer_id;
-    }
-
-    public function get_slang()
-    {
-        $slang = $this->get_option('slang', self::SLANG);
-
-        if (empty($slang)) {
-            return self::SLANG;
-        }
-
-        return $slang;
+        return $this->get_option('example', 'default');
     }
 
     public function get_badge_button_optinon()
@@ -257,14 +229,8 @@ final class GutenbergA11y
     function api_proofreader_info()
     {
         $ajax_nonce = wp_create_nonce("gutenberga11y-proofreader");
-        $key_for_proofreader = $this->get_customer_id();
-        $slang = $this->get_slang();
-        $enableGrammar = ($this->get_customer_id() === self::TRIAL_CUSTOMER_ID) ? 'false' : 'true';
         $wsc_proofreader_config = array(
-            'key_for_proofreader' => $key_for_proofreader,
-            'slang' => $slang,
             'ajax_nonce' => $ajax_nonce,
-            'enableGrammar' => $enableGrammar
         );
         wp_enqueue_script('ProofreaderInstance');
         wp_localize_script('ProofreaderInstance', 'ProofreaderInstance', $wsc_proofreader_config);
@@ -273,7 +239,6 @@ final class GutenbergA11y
 
     function get_proofreader_info_callback()
     {
-        $current_lang = $this->get_slang();
         check_ajax_referer('gutenberga11y-proofreader', 'security');
         $proofreader_info = $_POST['getInfoResult'];
         update_option('wsc_proofreader_info', $proofreader_info);
@@ -281,7 +246,7 @@ final class GutenbergA11y
         ?>
       <select class="regular" name="wsc_proofreader[slang]" id="wsc_proofreader[slang]">
           <?php foreach ($proofreader_info['langList']['ltr'] as $key => $value): ?>
-            <option <?php if ($current_lang === $key) {
+            <option <?php if ($key === $key) {
                 echo 'selected';
             } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
           <?php endforeach; ?>
@@ -350,7 +315,5 @@ function is_gutenberg_active()
         return true;
     }
 
-    $use_block_editor = (get_option('classic-editor-replace') === 'no-replace');
-
-    return $use_block_editor;
+    return (get_option('classic-editor-replace') === 'no-replace');
 }
