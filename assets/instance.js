@@ -4,7 +4,7 @@ jQuery(document).ready(function ($) {
     AppInstance = WEBSPELLCHECKER.initWebApi({
         autoSearch: true,
         serviceProtocol: 'https',
-        serviceHost: 'svc.webspellchecker.net',
+        serviceHost: 'svc.gutenberga11y.net',
         servicePath: 'spellcheck31/script/ssrv.cgi',
         servicePort: '443',
         enableGrammar: CheckEnableGrammar,
@@ -33,7 +33,7 @@ jQuery(document).ready(function ($) {
             });
         },
         error: function (res) {
-            $('#wsc_proofreader').prepend('<span class="description" style="font-size:15px;color: red;"> Oooops! Something went wrong. Open browser console for details. For technical assistance contact us at <a href="mailto:support@webspellchecker.net">support@webspellchecker.net</a></span>');
+            $('#wsc_proofreader').prepend('<span class="description" style="font-size:15px;color: red;"> Oooops! Something went wrong. Open browser console for details. For technical assistance contact us at <a href="mailto:support@gutenberga11y.net">support@gutenberga11y.net</a></span>');
         }
     });
 });

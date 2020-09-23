@@ -517,7 +517,7 @@ class WeDevs_Settings_API {
                         do_action( 'wsa_form_bottom_' . $form['id'], $form );
                         if ( isset( $this->settings_fields[ $form['id'] ] ) ):
                         ?>
-                            <div><i>We encourage you to take the time to review our revised <a href="https://webspellchecker.com/privacy-policy/" target="_blank">Privacy Policy</a> ‌and <a href="https://webspellchecker.com/terms-of-service/" target="_blank">Terms of Service</a>. By continuing to use WebSpellChecker Services, you acknowledge our Privacy Policy and agree to our Terms of Service.</i></div>
+                            <div><i>We encourage you to take the time to review our revised <a href="https://gutenberga11y.com/privacy-policy/" target="_blank">Privacy Policy</a> ‌and <a href="https://gutenberga11y.com/terms-of-service/" target="_blank">Terms of Service</a>. By continuing to use WebSpellChecker Services, you acknowledge our Privacy Policy and agree to our Terms of Service.</i></div>
                         <div style="padding-left: 10px">
                             <?php submit_button(); ?>
                         </div>

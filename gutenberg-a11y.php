@@ -37,9 +37,9 @@ final class GutenbergA11y
     {
         $this->includes();
         $this->settings = new WSC_Settings(
-            __('GutenbergA11y', 'webspellchecker'),
-            __('GutenbergA11y', 'webspellchecker'),
-            'spell-checker-settings'
+            __('GutenbergA11y', 'gutenberga11y'),
+            __('GutenbergA11y', 'gutenberga11y'),
+            'gutenberg-a11y-settings'
         );
 
         $this->options = !empty(get_option(WSC_Settings::OPTION_NAME)) ? get_option(WSC_Settings::OPTION_NAME) : array();
@@ -80,7 +80,7 @@ final class GutenbergA11y
     {
         $editable_post_type = $this->get_editable_post_type();
         $screen = get_current_screen();
-        if ($screen->base === 'settings_page_spell-checker-settings') {
+        if ($screen->base === 'settings_page_gutenberg-a11y-settings') {
             $this->api_proofreader_info();
         }
 
@@ -191,7 +191,7 @@ final class GutenbergA11y
     function add_action_links($links)
     {
         $mylinks = array(
-            '<a href="' . admin_url('options-general.php?page=spell-checker-settings') . '">' . __('Settings', 'webspellchecker') . '</a>',
+            '<a href="' . admin_url('options-general.php?page=gutenberg-a11y-settings') . '">' . __('Settings', 'gutenberga11y') . '</a>',
         );
 
         return array_merge($links, $mylinks);
@@ -199,8 +199,6 @@ final class GutenbergA11y
 
     function register_proofreader_scripts()
     {
-        wp_register_script('wscbundle', 'https://svc.webspellchecker.net/spellcheck31/wscbundle/wscbundle.js', array(), '081120181109', false);
-        wp_register_script('ProofreaderConfig', plugin_dir_url(__FILE__) . '/assets/proofreaderConfig.js', array('wscbundle'), '081120181110', true);
         wp_register_script('ProofreaderInstance', plugin_dir_url(__FILE__) . '/assets/instance.js', array('wscbundle'), '171220181251', true);
     }
 
@@ -208,21 +206,13 @@ final class GutenbergA11y
     {
         $key_for_proofreader = $this->get_customer_id();
         $slang = $this->get_slang();
-        $settingsSections = ($this->get_customer_id() === self::TRIAL_CUSTOMER_ID) ?
-            ['options', 'languages', 'about']
-            : ['options', 'languages', 'dictionaries', 'about'];
-        $enableGrammar = ($this->get_customer_id() === self::TRIAL_CUSTOMER_ID) ? 'false' : 'true';
         $badge_button_optinon = ($this->get_badge_button_optinon() === self::BADGE_BUTTON) ? 'true' : 'false';
         $wsc_proofreader_config = array(
             'key_for_proofreader' => $key_for_proofreader,
             'slang' => $slang,
-            'settingsSections' => $settingsSections,
-            'enableGrammar' => $enableGrammar,
+            'enableGrammar' => 'false',
             'disableBadgeButton' => $badge_button_optinon,
         );
-        wp_enqueue_script('wscbundle');
-        wp_enqueue_script('ProofreaderConfig');
-        wp_localize_script('ProofreaderConfig', 'WSCProofreaderConfig', $wsc_proofreader_config);
     }
 
     /**
@@ -266,7 +256,7 @@ final class GutenbergA11y
 
     function api_proofreader_info()
     {
-        $ajax_nonce = wp_create_nonce("webspellchecker-proofreader");
+        $ajax_nonce = wp_create_nonce("gutenberga11y-proofreader");
         $key_for_proofreader = $this->get_customer_id();
         $slang = $this->get_slang();
         $enableGrammar = ($this->get_customer_id() === self::TRIAL_CUSTOMER_ID) ? 'false' : 'true';
@@ -276,7 +266,6 @@ final class GutenbergA11y
             'ajax_nonce' => $ajax_nonce,
             'enableGrammar' => $enableGrammar
         );
-        wp_enqueue_script('wscbundle');
         wp_enqueue_script('ProofreaderInstance');
         wp_localize_script('ProofreaderInstance', 'ProofreaderInstance', $wsc_proofreader_config);
     }
@@ -285,7 +274,7 @@ final class GutenbergA11y
     function get_proofreader_info_callback()
     {
         $current_lang = $this->get_slang();
-        check_ajax_referer('webspellchecker-proofreader', 'security');
+        check_ajax_referer('gutenberga11y-proofreader', 'security');
         $proofreader_info = $_POST['getInfoResult'];
         update_option('wsc_proofreader_info', $proofreader_info);
         ob_start();

@@ -47,7 +47,7 @@ if ( ! class_exists( 'WeDevs_Settings_API_Test' ) ) {
 		function enable_woocommerce( $settings_fields ) {
 			$enable_on_products = array(
 				'name'    => 'enable_on_products',
-				'label'   => __( 'Check Products', 'webspellchecker' ),
+				'label'   => __( 'Check Products', 'gutenberga11y' ),
 				'type'    => 'checkbox',
 				'default' => 'on'
 			);
@@ -87,58 +87,32 @@ if ( ! class_exists( 'WeDevs_Settings_API_Test' ) ) {
 			$settings_fields = array(
 				'wsc_proofreader' => array(
 					array(
-						'name'              => 'customer_id',
-						'label'             => __( 'License Key', 'webspellchecker' ),
-						'desc'              => __( 'Upgrade to GutenbergA11y Pro for <strong>$49 per year</strong> to check spelling and grammar across a list of your websites. <br>Contact us at <a href="mailto:info@webspellchecker.net">info@webspellchecker.net</a> to find out how to proceed with the upgrade.', 'webspellchecker' ),
-						'type'              => 'text',
-						'default'           => '',
-						'sanitize_callback' => 'sanitize_text_field'
-					),
-					array(
-						'name'    => 'slang',
-						'label'   => __( 'Default Language', 'webspellchecker' ),
-						'type'    => 'select',
-						'options' => ! empty( $this->get_lang_list() ) ? $this->get_lang_list() : array(
-							'en_US' => 'English',
-							'en_GB' => 'British English',
-							'en_CA' => 'Canadian English',
-							'fr_FR' => 'French',
-							'fr_CA' => 'Canadian French',
-							'de_DE' => 'German',
-							'it_IT' => 'Italian',
-							'pt_PT' => 'Portuguese',
-							'pt_BR' => 'Brazilian Portuguese',
-							'da_DK' => 'Danish',
-						),
-						'default' => 'en_US'
-					),
-					array(
 						'name'    => 'disable_badge_button',
-						'label'   => __( 'Disable GutenbergA11y Badge', 'webspellchecker' ),
+						'label'   => __( 'Disable GutenbergA11y Badge', 'gutenberga11y' ),
 						'type'    => 'checkbox',
 						'default' => 'off'
 					),
 					array(
 						'name'    => 'enable_on_posts',
-						'label'   => __( 'Check Posts', 'webspellchecker' ),
+						'label'   => __( 'Check Posts', 'gutenberga11y' ),
 						'type'    => 'checkbox',
 						'default' => 'on'
 					),
 					array(
 						'name'    => 'enable_on_pages',
-						'label'   => __( 'Check Pages', 'webspellchecker' ),
+						'label'   => __( 'Check Pages', 'gutenberga11y' ),
 						'type'    => 'checkbox',
 						'default' => 'on'
 					),
 					array(
 						'name'    => 'enable_on_categories',
-						'label'   => __( 'Check Categories', 'webspellchecker' ),
+						'label'   => __( 'Check Categories', 'gutenberga11y' ),
 						'type'    => 'checkbox',
 						'default' => 'on'
 					),
 					array(
 						'name'    => 'enable_on_tags',
-						'label'   => __( 'Check Tags', 'webspellchecker' ),
+						'label'   => __( 'Check Tags', 'gutenberga11y' ),
 						'type'    => 'checkbox',
 						'default' => 'on'
 					)
