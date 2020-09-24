@@ -14,4 +14,4 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 delete_option( 'wsc' );
 delete_option( 'wsc_proofreader_version' );
 delete_option( 'wsc_proofreader_info' );
-delete_option( 'wsc_proofreader' );
+delete_option( 'gutenberg-a11y' );

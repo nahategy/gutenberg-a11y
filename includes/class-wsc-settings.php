@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 if ( ! class_exists( 'WeDevs_Settings_API_Test' ) ) {
 	class WSC_Settings {
-		const OPTION_NAME = 'wsc_proofreader';
+		const OPTION_NAME = 'gutenberg-a11y';
 
 		/**
 		 * @var WeDevs_Settings_API
@@ -51,7 +51,7 @@ if ( ! class_exists( 'WeDevs_Settings_API_Test' ) ) {
 				'type'    => 'checkbox',
 				'default' => 'on'
 			);
-			array_push( $settings_fields['wsc_proofreader'], $enable_on_products );
+			array_push( $settings_fields['gutenberg-a11y'], $enable_on_products );
 
 			return $settings_fields;
 		}
@@ -85,7 +85,7 @@ if ( ! class_exists( 'WeDevs_Settings_API_Test' ) ) {
 		 */
 		function get_settings_fields() {
 			$settings_fields = array(
-				'wsc_proofreader' => array(
+				'gutenberg-a11y' => array(
 					array(
 						'name'    => 'disable_badge_button',
 						'label'   => __( 'Disable GutenbergA11y Badge', 'gutenberga11y' ),

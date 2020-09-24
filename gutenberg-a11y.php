@@ -188,7 +188,7 @@ final class GutenbergA11y
     function add_action_links($links)
     {
         $mylinks = array(
-            '<a href="' . admin_url('options-general.php?page=gutenberg-a11y-settings') . '">' . __('Settings', 'gutenberga11y') . '</a>',
+//            '<a href="' . admin_url('options-general.php?page=gutenberg-a11y-settings') . '">' . __('Settings', 'gutenberga11y') . '</a>',
         );
 
         return array_merge($links, $mylinks);
@@ -228,7 +228,7 @@ final class GutenbergA11y
 
     function api_proofreader_info()
     {
-        $ajax_nonce = wp_create_nonce("gutenberga11y-proofreader");
+        $ajax_nonce = wp_create_nonce("gutenberg-a11y-pl");
         $wsc_proofreader_config = array(
             'ajax_nonce' => $ajax_nonce,
         );
@@ -239,7 +239,7 @@ final class GutenbergA11y
 
     function get_proofreader_info_callback()
     {
-        check_ajax_referer('gutenberga11y-proofreader', 'security');
+        check_ajax_referer('gutenberg-a11y-pl', 'security');
         $proofreader_info = $_POST['getInfoResult'];
         update_option('wsc_proofreader_info', $proofreader_info);
         ob_start();
