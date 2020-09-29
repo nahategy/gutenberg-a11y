@@ -21,6 +21,7 @@ final class GutenbergA11y
     private $js_added = false;
     private $settings;
     protected $options;
+    protected $lang = 'en-US';
 
     public static function instance()
     {
@@ -40,6 +41,7 @@ final class GutenbergA11y
             'gutenberg-a11y-settings'
         );
 
+        $this->lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
         $this->options = !empty(get_option(WSC_Settings::OPTION_NAME)) ? get_option(WSC_Settings::OPTION_NAME) : array();
 
         if (empty($this->options)) {
@@ -187,8 +189,7 @@ final class GutenbergA11y
 
     function add_action_links($links)
     {
-        $mylinks = array(
-//            '<a href="' . admin_url('options-general.php?page=gutenberg-a11y-settings') . '">' . __('Settings', 'gutenberga11y') . '</a>',
+        $mylinks = array(//            '<a href="' . admin_url('options-general.php?page=gutenberg-a11y-settings') . '">' . __('Settings', 'gutenberga11y') . '</a>',
         );
 
         return array_merge($links, $mylinks);
@@ -207,6 +208,10 @@ final class GutenbergA11y
             'disableBadgeButton' => $badge_button_optinon,
         );
         wp_enqueue_script('ProofreaderInstance');
+        $object = array(
+            'language' => $this->lang,
+        );
+        wp_localize_script('ProofreaderInstance', 'gutenberA11yConfig', $object);
     }
 
     public function get_option_example()
