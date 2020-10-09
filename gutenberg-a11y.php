@@ -242,6 +242,7 @@ final class GutenbergA11y
         $object = array(
             'language' => $this->lang,
             'language_code' => $this->lang_code,
+            'plugin_url' => plugins_url() . '/gutenberg-a11y',
         );
         wp_localize_script('ProofreaderInstance', 'gutenberA11yConfig', $object);
     }
