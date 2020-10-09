@@ -57,7 +57,7 @@ final class GutenbergA11y
 
         add_action('admin_enqueue_scripts', array($this, 'register_proofreader_scripts'));
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_action_links'));
-        add_action('admin_head', array($this, 'init_proofreader'));
+        add_action('admin_head', array($this, 'init_a11y_checker'));
 
         $this->check_version();
 
@@ -103,7 +103,7 @@ final class GutenbergA11y
         }
     }
 
-    public function init_proofreader()
+    public function init_a11y_checker()
     {
         $editable_post_type = $this->get_editable_post_type();
         $screen = get_current_screen();
@@ -116,7 +116,7 @@ final class GutenbergA11y
                 if ($screen->id === 'edit-category'
                     || $screen->id === 'edit-product_cat'
                     || $screen->id === 'edit-wpsc_product_category') {
-                    $this->init_proofreader_js();
+                    $this->init_a11y_checker_js();
                 }
             }
         }
@@ -125,7 +125,7 @@ final class GutenbergA11y
             if ($option === 'enable_on_tags' && $on === 'on') {
                 if ($screen->id === 'edit-product_tag'
                     || $screen->id === 'edit-post_tag') {
-                    $this->init_proofreader_js();
+                    $this->init_a11y_checker_js();
                 }
             }
         }
@@ -137,7 +137,7 @@ final class GutenbergA11y
                 if ($option === 'enable_on_posts' && $on === 'on') {
                     if (0 === strcasecmp('post', $editable_post_type)) {
 
-                        $this->init_proofreader_js();
+                        $this->init_a11y_checker_js();
                     }
                     break;
                 }
@@ -148,7 +148,7 @@ final class GutenbergA11y
                 if ($option === 'enable_on_pages' && $on === 'on') {
 
                     if (0 === strcasecmp('page', $editable_post_type)) {
-                        $this->init_proofreader_js();
+                        $this->init_a11y_checker_js();
                     }
                     break;
                 }
@@ -158,18 +158,18 @@ final class GutenbergA11y
 
                 if ($option === 'enable_on_products' && $on === 'on') {
                     if ($screen->id === 'wpsc-product') {
-                        $this->init_proofreader_js();
+                        $this->init_a11y_checker_js();
                     }
 
                     if ($screen->id === 'edit-product_cat') {
-                        $this->init_proofreader_js();
+                        $this->init_a11y_checker_js();
                     }
                     if ($screen->id === 'edit-product_tag') {
 
-                        $this->init_proofreader_js();
+                        $this->init_a11y_checker_js();
                     }
                     if (0 === strcasecmp('product', $editable_post_type)) {
-                        $this->init_proofreader_js();
+                        $this->init_a11y_checker_js();
                     }
 
                     break;
@@ -184,7 +184,7 @@ final class GutenbergA11y
 
                 foreach ($additionalCPT as $key => $value) {
                     if (0 === strcasecmp($value, $editable_post_type)) {
-                        $this->init_proofreader_js();
+                        $this->init_a11y_checker_js();
                     }
                 }
 
@@ -228,7 +228,7 @@ final class GutenbergA11y
         wp_register_script('ProofreaderInstance', plugin_dir_url(__FILE__) . '/assets/instance.js', null, '171220181251', true);
     }
 
-    function init_proofreader_js()
+    function init_a11y_checker_js()
     {
         $badge_button_optinon = ($this->get_badge_button_optinon() === self::BADGE_BUTTON) ? 'true' : 'false';
         $gta11y_proofreader_config = array(
