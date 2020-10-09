@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  */
 if ( ! class_exists( 'WeDevs_Settings_API_Test' ) ) {
-	class WSC_Settings {
+	class GtA11Y_Settings {
 		const OPTION_NAME = 'gutenberg-a11y';
 
 		/**
@@ -32,7 +32,7 @@ if ( ! class_exists( 'WeDevs_Settings_API_Test' ) ) {
 			//enable if woocommerce active
 			include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 			if ( class_exists( 'WooCommerce' ) && is_plugin_active( 'woocommerce/woocommerce.php' ) || class_exists( 'WP_eCommerce' ) ) {
-				add_filter( 'wsc_admin_fields', array( $this, 'enable_woocommerce' ), 1 );
+				add_filter( 'gutenberg_a11y_admin_fields', array( $this, 'enable_woocommerce' ), 1 );
 			}
 
 			//set the settings
@@ -120,7 +120,7 @@ if ( ! class_exists( 'WeDevs_Settings_API_Test' ) ) {
 				)
 			);
 
-			return apply_filters( 'wsc_admin_fields', $settings_fields );
+			return apply_filters( 'gutenberg_a11y_admin_fields', $settings_fields );
 		}
 
 		function plugin_page() {
@@ -149,7 +149,7 @@ if ( ! class_exists( 'WeDevs_Settings_API_Test' ) ) {
 		}
 
 		function get_lang_list() {
-			$get_info = get_option( 'wsc_proofreader_info' );
+			$get_info = get_option( 'gta11y_proofreader_info' );
 
 			return $get_info['langList']['ltr'];
 		}

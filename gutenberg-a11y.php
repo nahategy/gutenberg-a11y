@@ -35,14 +35,14 @@ final class GutenbergA11y
     public function __construct()
     {
         $this->includes();
-        $this->settings = new WSC_Settings(
+        $this->settings = new GtA11Y_Settings(
             __('GutenbergA11y', 'gutenberga11y'),
             __('GutenbergA11y', 'gutenberga11y'),
             'gutenberg-a11y-settings'
         );
 
         $this->lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-        $this->options = !empty(get_option(WSC_Settings::OPTION_NAME)) ? get_option(WSC_Settings::OPTION_NAME) : array();
+        $this->options = !empty(get_option(GtA11Y_Settings::OPTION_NAME)) ? get_option(GtA11Y_Settings::OPTION_NAME) : array();
 
         if (empty($this->options)) {
             //set default setting
@@ -51,7 +51,7 @@ final class GutenbergA11y
             $this->options['enable_on_products'] = 'off';
             $this->options['enable_on_categories'] = 'on';
             $this->options['enable_on_tags'] = 'on';
-            update_option('wsc_proofreader_version', self::PLUGIN_VERSION);
+            update_option('gta11y_proofreader_version', self::PLUGIN_VERSION);
         }
 
 
@@ -62,16 +62,44 @@ final class GutenbergA11y
         $this->check_version();
 
         add_action('wp_ajax_get_proofreader_info_callback', array($this, 'get_proofreader_info_callback'));
-        do_action('wsc_loaded');
+        do_action('gta11y_loaded');
     }
 
     public function check_version()
     {
         //todo add Class for upgrade plugin
-        if (get_option('wsc_proofreader_version') !== self::PLUGIN_VERSION) {
+        if (get_option('gta11y_proofreader_version') !== self::PLUGIN_VERSION) {
             //Clear old options in versions below 2
-            delete_option('wsc');
-            update_option('wsc_proofreader_version', self::PLUGIN_VERSION);
+            delete_option('gta11y');
+            update_option('gta11y_proofreader_version', self::PLUGIN_VERSION);
+        }
+    }
+
+    public static function is_gutenberg_active()
+    {
+        {
+            $gutenberg = false;
+            $block_editor = false;
+
+            if (has_filter('replace_editor', 'gutenberg_init')) {
+                $gutenberg = true;
+            }
+
+            if (version_compare($GLOBALS['wp_version'], '5.0', '>')) {
+                $block_editor = true;
+            }
+
+            if (!$gutenberg && !$block_editor) {
+                return false;
+            }
+
+            include_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+            if (!is_plugin_active('classic-editor/classic-editor.php')) {
+                return true;
+            }
+
+            return (get_option('classic-editor-replace') === 'no-replace');
         }
     }
 
@@ -171,7 +199,7 @@ final class GutenbergA11y
     public function includes()
     {
         require_once dirname(__FILE__) . '/vendor/class.settings-api.php';
-        require_once dirname(__FILE__) . '/includes/class-wsc-settings.php';
+        require_once dirname(__FILE__) . '/includes/class-gutenberg-a11y-settings.php';
     }
 
     public function get_editable_post_type()
@@ -203,7 +231,7 @@ final class GutenbergA11y
     function init_proofreader_js()
     {
         $badge_button_optinon = ($this->get_badge_button_optinon() === self::BADGE_BUTTON) ? 'true' : 'false';
-        $wsc_proofreader_config = array(
+        $gta11y_proofreader_config = array(
             'enableGrammar' => 'false',
             'disableBadgeButton' => $badge_button_optinon,
         );
@@ -234,11 +262,11 @@ final class GutenbergA11y
     function api_proofreader_info()
     {
         $ajax_nonce = wp_create_nonce("gutenberg-a11y-pl");
-        $wsc_proofreader_config = array(
+        $gta11y_proofreader_config = array(
             'ajax_nonce' => $ajax_nonce,
         );
         wp_enqueue_script('ProofreaderInstance');
-        wp_localize_script('ProofreaderInstance', 'ProofreaderInstance', $wsc_proofreader_config);
+        wp_localize_script('ProofreaderInstance', 'ProofreaderInstance', $gta11y_proofreader_config);
     }
 
 
@@ -246,10 +274,10 @@ final class GutenbergA11y
     {
         check_ajax_referer('gutenberg-a11y-pl', 'security');
         $proofreader_info = $_POST['getInfoResult'];
-        update_option('wsc_proofreader_info', $proofreader_info);
+        update_option('gta11y_proofreader_info', $proofreader_info);
         ob_start();
         ?>
-      <select class="regular" name="wsc_proofreader[slang]" id="wsc_proofreader[slang]">
+      <select class="regular" name="gta11y_proofreader[slang]" id="gta11y_proofreader[slang]">
           <?php foreach ($proofreader_info['langList']['ltr'] as $key => $value): ?>
             <option <?php if ($key === $key) {
                 echo 'selected';
@@ -266,11 +294,11 @@ final class GutenbergA11y
         add_action('wp_insert_post_data', function ($data, $postarr) {
             if ('publish' == $data['post_status']) {
                 $string = $data['post_content'];
-                $new_string = preg_replace('#(<span class=."wsc-spelling-problem." .*?>)(.*?)(</span>)#', '$2', $string);
-                $new_string = preg_replace('#(<span class=."wsc-grammar-problem." .*?>)(.*?)(</span>)#', '$2', $new_string);
+                $new_string = preg_replace('#(<span class=."gta11y-spelling-problem." .*?>)(.*?)(</span>)#', '$2', $string);
+                $new_string = preg_replace('#(<span class=."gta11y-grammar-problem." .*?>)(.*?)(</span>)#', '$2', $new_string);
                 $new_string = preg_replace('#(<span class=."rangySelectionBoundary." .*?>)(.*?)(</span>)#', '$2', $new_string);
-                $new_string = preg_replace('#(<span class="wsc-spelling-problem".*?>)(.*?)(</span>)#', '$2', $new_string);
-                $new_string = preg_replace('#(<span class="wsc-grammar-problem" .*?>)(.*?)(</span>)#', '$2', $new_string);
+                $new_string = preg_replace('#(<span class="gta11y-spelling-problem".*?>)(.*?)(</span>)#', '$2', $new_string);
+                $new_string = preg_replace('#(<span class="gta11y-grammar-problem" .*?>)(.*?)(</span>)#', '$2', $new_string);
                 $new_string = preg_replace('#(<span class="rangySelectionBoundary" .*?>)(.*?)(</span>)#', '$2', $new_string);
                 $new_string = preg_replace('#(<span class=..rangySelectionBoundary.. .*?>)(.*?)(</span>)#', '$2', $new_string);
                 $data['post_content'] = $new_string;
@@ -281,44 +309,11 @@ final class GutenbergA11y
     }
 }
 
-function WSC()
-{
-    return GutenbergA11y::instance();
+if (is_admin()) {
+    GutenbergA11y::instance();
 }
 
-if (is_admin()) {
-    WSC();
-}
-/**
- * fix for Gutenberg
- * todo write more cleaner
- */
-if (true === is_gutenberg_active()) {
+if (true === GutenbergA11y::is_gutenberg_active()) {
     GutenbergA11y::fix_for_gutenberg();
 };
 
-function is_gutenberg_active()
-{
-    $gutenberg = false;
-    $block_editor = false;
-
-    if (has_filter('replace_editor', 'gutenberg_init')) {
-        $gutenberg = true;
-    }
-
-    if (version_compare($GLOBALS['wp_version'], '5.0', '>')) {
-        $block_editor = true;
-    }
-
-    if (!$gutenberg && !$block_editor) {
-        return false;
-    }
-
-    include_once ABSPATH . 'wp-admin/includes/plugin.php';
-
-    if (!is_plugin_active('classic-editor/classic-editor.php')) {
-        return true;
-    }
-
-    return (get_option('classic-editor-replace') === 'no-replace');
-}
