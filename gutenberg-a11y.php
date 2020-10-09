@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Gutenberg A11y
- * Plugin URI: https://example.com/
+ * Plugin URI: https://github.com/nahategy/gutenberg-a11y
  * Description: Check Accessibility of Pages made with the Gutenberg editor
  * Version:     0.1
  * Author:      University Of Pannonia
