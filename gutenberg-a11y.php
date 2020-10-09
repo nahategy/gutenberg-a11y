@@ -236,8 +236,12 @@ final class GutenbergA11y
             'disableBadgeButton' => $badge_button_optinon,
         );
         wp_enqueue_script('ProofreaderInstance');
+
+        $this->lang_code = preg_split('/,/', $this->lang)[0];
+
         $object = array(
             'language' => $this->lang,
+            'language_code' => $this->lang_code,
         );
         wp_localize_script('ProofreaderInstance', 'gutenberA11yConfig', $object);
     }
