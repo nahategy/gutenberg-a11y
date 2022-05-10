@@ -31,30 +31,24 @@ final class GutenbergA11y
 
     public function __construct()
     {
-        $this->includes();
-
-
         $this->lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
 
-
-
-        add_action('admin_enqueue_scripts', array($this, 'register_proofreader_scripts'));
+        add_action('admin_enqueue_scripts', array($this, 'register_gutenberga11y_scripts'));
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_action_links'));
         add_action('admin_head', array($this, 'init_a11y_checker'));
 
         $this->check_version();
 
-        add_action('wp_ajax_get_proofreader_info_callback', array($this, 'get_proofreader_info_callback'));
         do_action('gta11y_loaded');
     }
 
     public function check_version()
     {
         //todo add Class for upgrade plugin
-        if (get_option('gta11y_proofreader_version') !== self::PLUGIN_VERSION) {
+        if (get_option('gta11y_version') !== self::PLUGIN_VERSION) {
             //Clear old options in versions below 2
             delete_option('gta11y');
-            update_option('gta11y_proofreader_version', self::PLUGIN_VERSION);
+            update_option('gta11y_version', self::PLUGIN_VERSION);
         }
     }
 
@@ -88,34 +82,10 @@ final class GutenbergA11y
 
     public function init_a11y_checker()
     {
-        $editable_post_type = $this->get_editable_post_type();
-        $screen = get_current_screen();
-        if ($screen->base === 'settings_page_gutenberg-a11y-settings') {
-            $this->api_proofreader_info();
-        }
-
-
-
         $this->init_a11y_checker_js();
         return $this->js_added = false;
     }
 
-    public function includes()
-    {
-    }
-
-    public function get_editable_post_type()
-    {
-        $screen = get_current_screen();
-
-        if ($screen->post_type === $screen->id) {
-            $post_type = $screen->post_type;
-
-            return $post_type;
-        }
-
-        return false;
-    }
 
     function add_action_links($links)
     {
@@ -125,20 +95,14 @@ final class GutenbergA11y
         return array_merge($links, $mylinks);
     }
 
-    function register_proofreader_scripts()
+    function register_gutenberga11y_scripts()
     {
-        wp_register_script('ProofreaderInstance', plugin_dir_url(__FILE__) . '/assets/instance.js', null, '171220181251', true);
+        wp_register_script('GutenbergA11YInstance', plugin_dir_url(__FILE__) . '/assets/instance.js', null, '171220181251', true);
     }
 
     function init_a11y_checker_js()
     {
-        $badge_button_optinon = ($this->get_badge_button_optinon() === self::BADGE_BUTTON) ? 'true' : 'false';
-        $gta11y_proofreader_config = array(
-            'enableGrammar' => 'false',
-            'disableBadgeButton' => $badge_button_optinon,
-        );
-        wp_enqueue_script('ProofreaderInstance');
-
+        wp_enqueue_script('GutenbergA11YInstance');
         $this->lang_code = preg_split('/,/', $this->lang)[0];
 
         $object = array(
@@ -146,54 +110,7 @@ final class GutenbergA11y
             'language_code' => $this->lang_code,
             'plugin_url' => plugins_url() . '/gutenberg-a11y',
         );
-        wp_localize_script('ProofreaderInstance', 'gutenberA11yConfig', $object);
-    }
-
-    public function get_option_example()
-    {
-        return $this->get_option('example', 'default');
-    }
-
-    public function get_badge_button_optinon()
-    {
-        $badge_button_optinon = $this->get_option('disable_badge_button', self::BADGE_BUTTON);
-
-        return $badge_button_optinon;
-    }
-
-    public function get_option($name, $default = '')
-    {
-        return (isset($this->options[$name])) ? $this->options[$name] : $default;
-    }
-
-    function api_proofreader_info()
-    {
-        $ajax_nonce = wp_create_nonce("gutenberg-a11y-pl");
-        $gta11y_proofreader_config = array(
-            'ajax_nonce' => $ajax_nonce,
-        );
-        wp_enqueue_script('ProofreaderInstance');
-        wp_localize_script('ProofreaderInstance', 'ProofreaderInstance', $gta11y_proofreader_config);
-    }
-
-
-    function get_proofreader_info_callback()
-    {
-        check_ajax_referer('gutenberg-a11y-pl', 'security');
-        $proofreader_info = $_POST['getInfoResult'];
-        update_option('gta11y_proofreader_info', $proofreader_info);
-        ob_start();
-        ?>
-        <select class="regular" name="gta11y_proofreader[slang]" id="gta11y_proofreader[slang]">
-            <?php foreach ($proofreader_info['langList']['ltr'] as $key => $value): ?>
-                <option <?php if ($key === $key) {
-                    echo 'selected';
-                } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
-            <?php endforeach; ?>
-        </select>
-        <?php
-        wp_send_json(ob_get_clean());
-        wp_die();
+        wp_localize_script('GutenbergA11YInstance', 'gutenberA11yConfig', $object);
     }
 
     public static function fix_for_gutenberg()

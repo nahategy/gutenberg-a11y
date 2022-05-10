@@ -12,6 +12,4 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 /* Place uninstall code below here. */
 
 delete_option( 'gta11y' );
-delete_option( 'gta11y_proofreader_version' );
-delete_option( 'gta11y_proofreader_info' );
 delete_option( 'gutenberg-a11y' );
