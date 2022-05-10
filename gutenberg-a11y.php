@@ -1,12 +1,11 @@
 <?php
 /**
- * Plugin Name: Gutenberg A11y
- * Plugin URI: https://github.com/nahategy/gutenberg-a11y
- * Description: Check Accessibility of Pages made with the Gutenberg editor
- * Version:     0.1
- * Author:      University Of Pannonia
+ * Plugin Name: Gutenberg Accessibility Checker
+ * Description: The plugin allows you to check and improve the content entered in the WordPress Gutenberg block editor based on the recommendations of the Web Content Accessibility Guidelines (WCAG).
+ * Version:     1.0
+ * Author:      DCS, University of Pannonia
  * Author URI:  https://mik.uni-pannon.hu/en
- * Text Domain: gtnbrga11y
+ * Text Domain: gutenberga11y
  */
 
 if (!defined('ABSPATH')) {
@@ -19,8 +18,6 @@ final class GutenbergA11y
     const PLUGIN_VERSION = "0.1";
     private static $instance = null;
     private $js_added = false;
-    private $settings;
-    protected $options;
     protected $lang = 'en-US';
 
     public static function instance()
@@ -35,24 +32,10 @@ final class GutenbergA11y
     public function __construct()
     {
         $this->includes();
-        $this->settings = new GtA11Y_Settings(
-            __('GutenbergA11y', 'gutenberga11y'),
-            __('GutenbergA11y', 'gutenberga11y'),
-            'gutenberg-a11y-settings'
-        );
+
 
         $this->lang = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-        $this->options = !empty(get_option(GtA11Y_Settings::OPTION_NAME)) ? get_option(GtA11Y_Settings::OPTION_NAME) : array();
 
-        if (empty($this->options)) {
-            //set default setting
-            $this->options['enable_on_posts'] = 'on';
-            $this->options['enable_on_pages'] = 'on';
-            $this->options['enable_on_products'] = 'off';
-            $this->options['enable_on_categories'] = 'on';
-            $this->options['enable_on_tags'] = 'on';
-            update_option('gta11y_proofreader_version', self::PLUGIN_VERSION);
-        }
 
 
         add_action('admin_enqueue_scripts', array($this, 'register_proofreader_scripts'));
@@ -111,95 +94,14 @@ final class GutenbergA11y
             $this->api_proofreader_info();
         }
 
-        foreach ($this->options as $option => $on) {
-            if ($option === 'enable_on_categories' && $on === 'on') {
-                if ($screen->id === 'edit-category'
-                    || $screen->id === 'edit-product_cat'
-                    || $screen->id === 'edit-wpsc_product_category') {
-                    $this->init_a11y_checker_js();
-                }
-            }
-        }
 
-        foreach ($this->options as $option => $on) {
-            if ($option === 'enable_on_tags' && $on === 'on') {
-                if ($screen->id === 'edit-product_tag'
-                    || $screen->id === 'edit-post_tag') {
-                    $this->init_a11y_checker_js();
-                }
-            }
-        }
 
-        if (false !== $editable_post_type) {
-
-            foreach ($this->options as $option => $on) {
-
-                if ($option === 'enable_on_posts' && $on === 'on') {
-                    if (0 === strcasecmp('post', $editable_post_type)) {
-
-                        $this->init_a11y_checker_js();
-                    }
-                    break;
-                }
-            }
-
-            foreach ($this->options as $option => $on) {
-
-                if ($option === 'enable_on_pages' && $on === 'on') {
-
-                    if (0 === strcasecmp('page', $editable_post_type)) {
-                        $this->init_a11y_checker_js();
-                    }
-                    break;
-                }
-            }
-
-            foreach ($this->options as $option => $on) {
-
-                if ($option === 'enable_on_products' && $on === 'on') {
-                    if ($screen->id === 'wpsc-product') {
-                        $this->init_a11y_checker_js();
-                    }
-
-                    if ($screen->id === 'edit-product_cat') {
-                        $this->init_a11y_checker_js();
-                    }
-                    if ($screen->id === 'edit-product_tag') {
-
-                        $this->init_a11y_checker_js();
-                    }
-                    if (0 === strcasecmp('product', $editable_post_type)) {
-                        $this->init_a11y_checker_js();
-                    }
-
-                    break;
-
-                }
-
-            }
-
-            $additionalCPT = apply_filters('wproofreader_add_cpt', $CPT = array());
-
-            if (!empty($additionalCPT)) {
-
-                foreach ($additionalCPT as $key => $value) {
-                    if (0 === strcasecmp($value, $editable_post_type)) {
-                        $this->init_a11y_checker_js();
-                    }
-                }
-
-            }
-
-            return $this->js_added = true;
-        }
-
+        $this->init_a11y_checker_js();
         return $this->js_added = false;
     }
 
     public function includes()
     {
-        require_once dirname(__FILE__) . '/vendor/class.settings-api.php';
-        require_once dirname(__FILE__) . '/includes/class-gutenberg-a11y-settings.php';
     }
 
     public function get_editable_post_type()
@@ -282,13 +184,13 @@ final class GutenbergA11y
         update_option('gta11y_proofreader_info', $proofreader_info);
         ob_start();
         ?>
-      <select class="regular" name="gta11y_proofreader[slang]" id="gta11y_proofreader[slang]">
-          <?php foreach ($proofreader_info['langList']['ltr'] as $key => $value): ?>
-            <option <?php if ($key === $key) {
-                echo 'selected';
-            } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
-          <?php endforeach; ?>
-      </select>
+        <select class="regular" name="gta11y_proofreader[slang]" id="gta11y_proofreader[slang]">
+            <?php foreach ($proofreader_info['langList']['ltr'] as $key => $value): ?>
+                <option <?php if ($key === $key) {
+                    echo 'selected';
+                } ?> value="<?php echo $key; ?>"><?php echo $value; ?></option>
+            <?php endforeach; ?>
+        </select>
         <?php
         wp_send_json(ob_get_clean());
         wp_die();
